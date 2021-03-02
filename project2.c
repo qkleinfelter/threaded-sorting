@@ -10,6 +10,7 @@ int arraySize;
 
 // Methods
 bool isSorted();
+void swap(int* a, int* b);
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
@@ -34,6 +35,20 @@ int main(int argc, char* argv[]) {
 	} else {
 		printf("Array is not sorted! :(\n");
 	}
+
+	// Randomize array
+	for (int i = 0; i < arraySize; i++) {
+		int secondIndex = rand() % arraySize;
+		swap(&array[i], &array[secondIndex]);
+	}
+
+	sorted = isSorted();
+	
+	if (sorted) {
+		printf("Array is sorted!\n");
+	} else {
+		printf("Array is not sorted! :(\n");
+	}
 	return 0;
 }
 
@@ -45,4 +60,10 @@ bool isSorted() {
 		}
 	}
 	return true;
+}
+
+void swap(int* a, int* b) {
+	int temp = *a;
+	*a = *b;
+	*b = temp;
 }

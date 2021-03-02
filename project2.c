@@ -11,6 +11,8 @@ int arraySize;
 // Methods
 bool isSorted();
 void swap(int* a, int* b);
+void quickSort(int p, int r);
+int partition(int p, int r);
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
@@ -43,7 +45,17 @@ int main(int argc, char* argv[]) {
 	}
 
 	sorted = isSorted();
-	
+
+	if (sorted) {
+		printf("Array is sorted!\n");
+	} else {
+		printf("Array is not sorted! :(\n");
+	}
+
+	quickSort(0, arraySize);
+
+	sorted = isSorted();
+
 	if (sorted) {
 		printf("Array is sorted!\n");
 	} else {
@@ -66,4 +78,25 @@ void swap(int* a, int* b) {
 	int temp = *a;
 	*a = *b;
 	*b = temp;
+}
+
+void quickSort(int p, int r) {
+	if (p < r) { // base case: when down to 1 item, p == r
+		int q = partition(p, r); // split the list, pivot is q
+		quickSort(p, q - 1); // recursively quicksort the left side
+		quickSort(q + 1, r); // recursively quicksort the right side
+	}
+}
+
+int partition(int p, int r) {
+	int x = array[r]; // start with the last value as the pivot
+	int i = p - 1;
+	for (int j = p; j <= r - 1; j++) {
+		if(array[j] <= x) {
+			i = i + 1;
+			swap(&array[i], &array[j]);
+		}
+	}
+	swap(&array[i+1], &array[r]);
+	return i + 1;
 }

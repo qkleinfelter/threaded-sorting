@@ -13,6 +13,7 @@ bool isSorted();
 void swap(int* a, int* b);
 void quickSort(int p, int r);
 int partition(int p, int r);
+void shellSort();
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
@@ -61,6 +62,30 @@ int main(int argc, char* argv[]) {
 	} else {
 		printf("Array is not sorted! :(\n");
 	}
+
+	// Randomize again to test shellsort
+	for (int i = 0; i < arraySize; i++) {
+		int secondIndex = rand() % arraySize;
+		swap(&array[i], &array[secondIndex]);
+	}
+
+	sorted = isSorted();
+
+	if (sorted) {
+		printf("Array is sorted!\n");
+	} else {
+		printf("Array is not sorted! :(\n");
+	}
+
+	shellSort();
+
+	sorted = isSorted();
+
+	if (sorted) {
+		printf("Array is sorted!\n");
+	} else {
+		printf("Array is not sorted! :(\n");
+	}
 	return 0;
 }
 
@@ -99,4 +124,22 @@ int partition(int p, int r) {
 	}
 	swap(&array[i+1], &array[r]);
 	return i + 1;
+}
+
+void shellSort() {
+	int k = 1;
+	while (k <= arraySize) {
+		k *= 2;
+		k = (k / 2) - 1;
+	}
+
+	do {
+		for (int i = 0; i < (arraySize - k); i++) {
+			for (int j = i; j >= 0; j -= k) {
+				if (array[j] <= array[j + k]) break;
+				else swap(&array[j], &array[j+k]);
+			}
+		}
+		k = k >> 1;
+	} while (k > 0);
 }

@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 		printf("Not enough args.\n");
 		return 1;
 	}
-	arraySize = atoi(argv[2]);
+	arraySize = atoi(argv[1]);
 
 	array = (int*) malloc(sizeof(int)*arraySize);
 
@@ -31,6 +31,8 @@ int main(int argc, char* argv[]) {
 		array[i] = i;
 	}
 	
+	printf("Created array\n");
+
 	bool sorted = isSorted();
 
 	if (sorted) {
@@ -45,6 +47,8 @@ int main(int argc, char* argv[]) {
 		swap(&array[i], &array[secondIndex]);
 	}
 
+	printf("Randomized array\n");
+
 	sorted = isSorted();
 
 	if (sorted) {
@@ -53,7 +57,9 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	quickSort(0, arraySize);
+	printf("Testing quicksort\n");
+
+	quickSort(0, arraySize - 1);
 
 	sorted = isSorted();
 
@@ -69,6 +75,8 @@ int main(int argc, char* argv[]) {
 		swap(&array[i], &array[secondIndex]);
 	}
 
+	printf("Re-randomized array\n");
+
 	sorted = isSorted();
 
 	if (sorted) {
@@ -76,6 +84,8 @@ int main(int argc, char* argv[]) {
 	} else {
 		printf("Array is not sorted! :(\n");
 	}
+
+	printf("Testing shellsort\n");
 
 	shellSort();
 
@@ -87,12 +97,14 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 	return 0;
+
+	free(array);
 }
 
 bool isSorted() {
 	// Checks if the global array variable is sorted
-	for (int i = 0; i < arraySize - 1; i++) {
-		if (array[i] > array[i+1]) {
+	for (int i = 0; i < arraySize; i++) {
+		if (array[i] != i) {
 			return false;
 		}
 	}
@@ -114,16 +126,20 @@ void quickSort(int p, int r) {
 }
 
 int partition(int p, int r) {
-	int x = array[r]; // start with the last value as the pivot
-	int i = p - 1;
-	for (int j = p; j <= r - 1; j++) {
-		if(array[j] <= x) {
-			i = i + 1;
+	int i = p;
+	int j = r + 1;
+	int x = array[p];
+	do {
+		do i++; while (array[i] < x);
+		do j--; while (array[j] > x);
+		if (i < j) {
 			swap(&array[i], &array[j]);
+		} else {
+			break;
 		}
-	}
-	swap(&array[i+1], &array[r]);
-	return i + 1;
+	} while (true);
+	swap(&array[p], &array[j]);
+	return j;
 }
 
 void shellSort() {

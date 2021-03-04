@@ -20,6 +20,12 @@ void quickSort(int p, int r);
 int partition(int p, int r);
 void shellSort(int low, int hi);
 
+// Struct for passing L and R to worker threads
+typedef struct {
+	int L;
+	int R;
+} parameters;
+
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
 	printf("Found %d args\n", argc);
@@ -77,14 +83,18 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	clock_t start = clock();
+
 	array = (int*) malloc(sizeof(int)*arraySize);
 
 	for (int i = 0; i < arraySize; i++) {
 		// Fill our dynamic array
 		array[i] = i;
 	}
+
+	clock_t end = clock();
 	
-	printf("Created array\n");
+	printf("Created & initialized array in %ld ticks\n", end - start);
 
 	bool sorted = isSorted();
 
@@ -94,13 +104,17 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
+	start = clock();
+
 	// Randomize array
 	for (int i = 0; i < arraySize; i++) {
 		int secondIndex = rand() % arraySize;
 		swap(&array[i], &array[secondIndex]);
 	}
 
-	printf("Randomized array\n");
+	end = clock();
+
+	printf("Randomized array in %ld ticks\n", end - start);
 
 	sorted = isSorted();
 
@@ -112,7 +126,10 @@ int main(int argc, char* argv[]) {
 
 	printf("Testing quicksort\n");
 
+	start = clock();
 	quickSort(0, arraySize - 1);
+	end = clock();
+	printf("Ran quicksort in %ld ticks\n", end - start);
 
 	sorted = isSorted();
 
@@ -122,13 +139,15 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
+	start = clock();
 	// Randomize again to test shellsort
 	for (int i = 0; i < arraySize; i++) {
 		int secondIndex = rand() % arraySize;
 		swap(&array[i], &array[secondIndex]);
 	}
+	end = clock();
 
-	printf("Re-randomized array\n");
+	printf("Re-randomized array in %ld ticks\n", end - start);
 
 	sorted = isSorted();
 
@@ -140,7 +159,10 @@ int main(int argc, char* argv[]) {
 
 	printf("Testing shellsort\n");
 
+	start = clock();
 	shellSort(0, arraySize - 1);
+	end = clock();
+	printf("Ran shellsort in %ld seconds\n", (end - start) / 1000000);
 
 	sorted = isSorted();
 

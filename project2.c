@@ -38,15 +38,8 @@ int main(int argc, char* argv[]) {
 	if (argc >= 4) {
 		printf("Seed specified\n");
 		// At least 4 args, must have a seed
-		// TODO: Error Handling
-		unsigned int seed = (unsigned int) strtoul(argv[3], NULL, 10);
-		if (seed == 4294967295) { // Uint max, is probably -1, will handle better eventually
-			printf("Using clock as seed\n");
-			srand((unsigned int) clock());
-		} else {
-			printf("Seed %u\n", seed);
- 			srand(seed);
-		}
+		if (atoi(argv[3]) == -1) srand(clock());
+		else srand(atoi(argv[3]));
 	}
 
 	if (argc >= 5) {

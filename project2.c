@@ -24,7 +24,7 @@ void shellSort(int low, int hi);
 typedef struct {
 	int L;
 	int R;
-} parameters;
+} range;
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
@@ -105,53 +105,93 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	printf("Testing quicksort\n");
-	start = clock();
-	quickSort(0, arraySize - 1);
-	end = clock();
-	printf("Ran quicksort in %3.3f seconds\n", (double) (end - start) / 1000000);
+	// printf("Testing quicksort\n");
+	// start = clock();
+	// quickSort(0, arraySize - 1);
+	// end = clock();
+	// printf("Ran quicksort in %3.3f seconds\n", (double) (end - start) / 1000000);
 
-	sorted = isSorted();
-	// Should be sorted
-	if (sorted) {
-		printf("Array is sorted!\n");
-	} else {
-		printf("Array is not sorted! :(\n");
+	// sorted = isSorted();
+	// // Should be sorted
+	// if (sorted) {
+	// 	printf("Array is sorted!\n");
+	// } else {
+	// 	printf("Array is not sorted! :(\n");
+	// }
+
+	// start = clock();
+	// // Randomize again to test shellsort
+	// for (int i = 0; i < arraySize; i++) {
+	// 	int secondIndex = rand() % arraySize;
+	// 	swap(&array[i], &array[secondIndex]);
+	// }
+	// end = clock();
+	// printf("Re-randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
+
+	// sorted = isSorted();
+	// // Shouldn't be sorted
+	// if (sorted) {
+	// 	printf("Array is sorted!\n");
+	// } else {
+	// 	printf("Array is not sorted! :(\n");
+	// }
+
+	// printf("Testing shellsort\n");
+	// start = clock();
+	// shellSort(0, arraySize - 1);
+	// end = clock();
+	// printf("Ran shellsort in %3.3f seconds\n", (double) (end - start) / 1000000);
+
+	// sorted = isSorted();
+	// // Should be sorted
+	// if (sorted) {
+	// 	printf("Array is sorted!\n");
+	// } else {
+	// 	printf("Array is not sorted! :(\n");
+	// }
+	int left = 0;
+	int right = arraySize - 1;
+	int currPieces = 1;
+	// Array of ranges which are the partitions we have
+	range* pieces = (range*) malloc(numPartitions * sizeof(range));
+
+	// Our first "piece" is the whole array
+	pieces[0].L = left;
+	pieces[0].R = right;
+
+	while (currPieces < numPartitions) {
+		range* largest = &pieces[0];
+		int largestSize = largest->R - largest->L + 1;
+
+		for (int i = 1; i < currPieces; i++) {
+			range* current = &pieces[i];
+			int currSize = current->R - current->L + 1;
+			if (currSize > largestSize) {
+				largest = current;
+				largestSize = currSize;
+			}
+		}
+
+		printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
+
+		int midpt = partition(largest->L, largest->R);
+
+		range* newPart = &pieces[currPieces];
+		newPart->L = midpt + 1;
+		newPart->R = largest->R;
+
+		largest->R = midpt - 1;
+		int ls = largest->R - largest->L + 1;
+		int ns = newPart->R - newPart->L + 1;
+		int ts = ls + ns;
+		printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
+
+		currPieces++;
+
 	}
-
-	start = clock();
-	// Randomize again to test shellsort
-	for (int i = 0; i < arraySize; i++) {
-		int secondIndex = rand() % arraySize;
-		swap(&array[i], &array[secondIndex]);
-	}
-	end = clock();
-	printf("Re-randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	sorted = isSorted();
-	// Shouldn't be sorted
-	if (sorted) {
-		printf("Array is sorted!\n");
-	} else {
-		printf("Array is not sorted! :(\n");
-	}
-
-	printf("Testing shellsort\n");
-	start = clock();
-	shellSort(0, arraySize - 1);
-	end = clock();
-	printf("Ran shellsort in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	sorted = isSorted();
-	// Should be sorted
-	if (sorted) {
-		printf("Array is sorted!\n");
-	} else {
-		printf("Array is not sorted! :(\n");
-	}
-	return 0;
 
 	free(array);
+	return 0;
 }
 
 bool isSorted() {

@@ -28,7 +28,6 @@ typedef struct {
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
-	printf("Found %d args\n", argc);
 	if (argc < 3) {
 		printf("Not enough args.\n");
 		return 1;
@@ -84,40 +83,29 @@ int main(int argc, char* argv[]) {
 	}
 
 	clock_t start = clock();
-
 	array = (int*) malloc(sizeof(int)*arraySize);
+	clock_t end = clock();
+	printf("Created array in %3.3f seconds\n", (double) (end - start) / 1000000);
 
+	start = clock();
 	for (int i = 0; i < arraySize; i++) {
 		// Fill our dynamic array
 		array[i] = i;
 	}
-
-	clock_t end = clock();
-	
-	printf("Created & initialized array in %ld ticks\n", end - start);
-
-	bool sorted = isSorted();
-
-	if (sorted) {
-		printf("Array is sorted!\n");
-	} else {
-		printf("Array is not sorted! :(\n");
-	}
+	end = clock();
+	printf("Initialized array in %3.3f seconds\n", (double) (end - start) / 1000000);
 
 	start = clock();
-
 	// Randomize array
 	for (int i = 0; i < arraySize; i++) {
 		int secondIndex = rand() % arraySize;
 		swap(&array[i], &array[secondIndex]);
 	}
-
 	end = clock();
+	printf("Randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
 
-	printf("Randomized array in %ld ticks\n", end - start);
-
-	sorted = isSorted();
-
+	bool sorted = isSorted();
+	// Shouldn't be sorted
 	if (sorted) {
 		printf("Array is sorted!\n");
 	} else {
@@ -125,14 +113,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	printf("Testing quicksort\n");
-
 	start = clock();
 	quickSort(0, arraySize - 1);
 	end = clock();
-	printf("Ran quicksort in %ld ticks\n", end - start);
+	printf("Ran quicksort in %3.3f seconds\n", (double) (end - start) / 1000000);
 
 	sorted = isSorted();
-
+	// Should be sorted
 	if (sorted) {
 		printf("Array is sorted!\n");
 	} else {
@@ -146,11 +133,10 @@ int main(int argc, char* argv[]) {
 		swap(&array[i], &array[secondIndex]);
 	}
 	end = clock();
-
-	printf("Re-randomized array in %ld ticks\n", end - start);
+	printf("Re-randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
 
 	sorted = isSorted();
-
+	// Shouldn't be sorted
 	if (sorted) {
 		printf("Array is sorted!\n");
 	} else {
@@ -158,14 +144,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	printf("Testing shellsort\n");
-
 	start = clock();
 	shellSort(0, arraySize - 1);
 	end = clock();
-	printf("Ran shellsort in %ld seconds\n", (end - start) / 1000000);
+	printf("Ran shellsort in %3.3f seconds\n", (double) (end - start) / 1000000);
 
 	sorted = isSorted();
-
+	// Should be sorted
 	if (sorted) {
 		printf("Array is sorted!\n");
 	} else {

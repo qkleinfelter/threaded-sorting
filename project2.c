@@ -149,15 +149,13 @@ int main(int argc, char* argv[]) {
 	// } else {
 	// 	printf("Array is not sorted! :(\n");
 	// }
-	int left = 0;
-	int right = arraySize - 1;
 	int currPieces = 1;
 	// Array of ranges which are the partitions we have
 	range* pieces = (range*) malloc(numPartitions * sizeof(range));
 
 	// Our first "piece" is the whole array
-	pieces[0].L = left;
-	pieces[0].R = right;
+	pieces[0].L = 0;
+	pieces[0].R = arraySize - 1;
 
 	while (currPieces < numPartitions) {
 		range* largest = &pieces[0];

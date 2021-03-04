@@ -7,13 +7,14 @@
 // Global variables
 int* array;
 int arraySize;
+int threshold;
 
 // Methods
 bool isSorted();
 void swap(int* a, int* b);
 void quickSort(int p, int r);
 int partition(int p, int r);
-void shellSort();
+void shellSort(int low, int hi);
 
 int main(int argc, char* argv[]) {
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	arraySize = atoi(argv[1]);
+	threshold = atoi(argv[2]);
 
 	array = (int*) malloc(sizeof(int)*arraySize);
 
@@ -87,7 +89,7 @@ int main(int argc, char* argv[]) {
 
 	printf("Testing shellsort\n");
 
-	shellSort();
+	shellSort(0, arraySize - 1);
 
 	sorted = isSorted();
 
@@ -119,9 +121,14 @@ void swap(int* a, int* b) {
 
 void quickSort(int p, int r) {
 	if (p < r) { // base case: when down to 1 item, p == r
-		int q = partition(p, r); // split the list, pivot is q
-		quickSort(p, q - 1); // recursively quicksort the left side
-		quickSort(q + 1, r); // recursively quicksort the right side
+		if (threshold != 0 && r - p + 1 <= threshold) {
+			// Shellsort instead of quicksort
+			shellSort(p, r);			
+		} else {
+			int q = partition(p, r); // split the list, pivot is q
+			quickSort(p, q - 1); // recursively quicksort the left side
+			quickSort(q + 1, r); // recursively quicksort the right side
+		}
 	}
 }
 
@@ -142,16 +149,18 @@ int partition(int p, int r) {
 	return j;
 }
 
-void shellSort() {
+void shellSort(int low, int hi) {
+	// Shell sorting broke now
 	int k = 1;
-	while (k <= arraySize) {
+	int size = hi - low + 1;
+	while (k <= size) {
 		k *= 2;
-		k = (k / 2) - 1;
 	}
+	k = (k / 2) - 1;
 
 	do {
-		for (int i = 0; i < (arraySize - k); i++) {
-			for (int j = i; j >= 0; j -= k) {
+		for (int i = low; i < (low + size - k); i++) {
+			for (int j = i; j >= low; j -= k) {
 				if (array[j] <= array[j + k]) break;
 				else swap(&array[j], &array[j+k]);
 			}

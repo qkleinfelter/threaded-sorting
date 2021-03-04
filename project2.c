@@ -3,11 +3,13 @@
 #include <pthread.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <string.h>
 
 // Global variables
 int* array;
 int arraySize;
 int threshold;
+bool shouldMultithread = true;
 
 // Methods
 bool isSorted();
@@ -25,6 +27,29 @@ int main(int argc, char* argv[]) {
 	}
 	arraySize = atoi(argv[1]);
 	threshold = atoi(argv[2]);
+
+	if (argc >= 4) {
+		printf("Seed specified\n");
+		// At least 4 args, must have a seed
+		// TODO: Error handling
+		unsigned int seed = (unsigned int) strtoul(argv[3], NULL, 10);
+		if (seed == 4294967295) { // Uint max, is probably -1, will handle better eventually
+			printf("Using clock as seed\n");
+			srand((unsigned int) clock());
+		} else {
+			printf("Seed %u\n", seed);
+ 			srand(seed);
+		}
+	}
+
+	if (argc >= 5) {
+		// At least 5 args, must have a multithread choice
+		if (strncmp(argv[4], "n", 1) == 0|| strncmp(argv[4], "N", 1) == 0) {
+			printf("Not multithreading\n");
+			shouldMultithread = false;
+		}
+		else printf("Multithreading\n");
+	}
 
 	array = (int*) malloc(sizeof(int)*arraySize);
 
@@ -150,7 +175,6 @@ int partition(int p, int r) {
 }
 
 void shellSort(int low, int hi) {
-	// Shell sorting broke now
 	int k = 1;
 	int size = hi - low + 1;
 	while (k <= size) {

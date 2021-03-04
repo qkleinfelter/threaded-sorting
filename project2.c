@@ -10,6 +10,8 @@ int* array;
 int arraySize;
 int threshold;
 bool shouldMultithread = true;
+int numPartitions = 10;
+int maxThreads = 4;
 
 // Methods
 bool isSorted();
@@ -31,7 +33,7 @@ int main(int argc, char* argv[]) {
 	if (argc >= 4) {
 		printf("Seed specified\n");
 		// At least 4 args, must have a seed
-		// TODO: Error handling
+		// TODO: Error Handling
 		unsigned int seed = (unsigned int) strtoul(argv[3], NULL, 10);
 		if (seed == 4294967295) { // Uint max, is probably -1, will handle better eventually
 			printf("Using clock as seed\n");
@@ -49,6 +51,30 @@ int main(int argc, char* argv[]) {
 			shouldMultithread = false;
 		}
 		else printf("Multithreading\n");
+	}
+
+	if (argc >= 6) {
+		// At least 6 args, must specify number of pieces
+		// TODO: Error Handling
+		if (shouldMultithread) {
+			int partsSpec = atoi(argv[5]);
+			if (partsSpec > 0) numPartitions = partsSpec;
+			printf("Number of partitions: %d\n", numPartitions);
+		}
+	}
+
+	if (argc >= 7) {
+		// Specifying max threads
+		if (shouldMultithread) {
+			int threadsSpec = atoi(argv[6]);
+			if (threadsSpec > numPartitions) {
+				printf("Too many threads specified\n");
+				return 1;
+			} else {
+				maxThreads = threadsSpec;
+				printf("Max threads: %d\n", maxThreads);
+			}
+		}
 	}
 
 	array = (int*) malloc(sizeof(int)*arraySize);

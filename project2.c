@@ -1,9 +1,11 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/time.h>
 
 // Global variables
 int* array;
@@ -19,6 +21,7 @@ void swap(int* a, int* b);
 void quickSort(int p, int r);
 int partition(int p, int r);
 void shellSort(int low, int hi);
+void* runner(void* parameters);
 
 // Struct for passing L and R to worker threads
 typedef struct {
@@ -149,6 +152,8 @@ int main(int argc, char* argv[]) {
 	// } else {
 	// 	printf("Array is not sorted! :(\n");
 	// }
+
+	start = clock();
 	int currPieces = 1;
 	// Array of ranges which are the partitions we have
 	range* pieces = (range*) malloc(numPartitions * sizeof(range));
@@ -185,8 +190,98 @@ int main(int argc, char* argv[]) {
 		printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
 
 		currPieces++;
-
 	}
+	end = clock();
+
+	// Now we have the list of partitions, so we should sort these in descending
+	// order by size, so we can shoot them off into threads largest -> smallest
+	// this uses insertion sort for now, maybe switch to something better later?
+	for (int i = 1; i < numPartitions; i++) {
+		range current = pieces[i];
+		int j = i - 1;
+
+		while(current.R - current.L + 1 > pieces[j].R - pieces[j].L + 1 && j >= 0) {
+			pieces[j + 1] = pieces[j];
+			--j;
+		}
+		pieces[j + 1] = current;
+	}
+
+	// Verify insertion sort worked
+	// for (int i = 0; i < numPartitions; i++) {
+	// 	printf("%d, ", pieces[i].R - pieces[i].L + 1);
+	// }
+	// printf("\n");
+
+	printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
+
+	// Now start spawning threads to sort
+	start = clock();
+	struct timeval startTime;
+	gettimeofday(&startTime, NULL);
+
+	// Array of threads & thread attributes
+	pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
+	pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
+	int nextThread = 0;
+
+	for (int i = 0; i < maxThreads; i++) {
+		// Spawn off our initial maxThreads threads
+		// grab the current piece
+		range* piece = &pieces[nextThread];
+		// setup its attributes
+		pthread_attr_init(&threadAttributes[i]);
+		// and create the thread
+		pthread_create(&threads[i], &threadAttributes[i], runner, piece);
+		nextThread++; // then increment which thread we're working on
+	}
+
+	// Now that we've spawned our first set of threads, we need to check repeatedly
+	// to continue spawning the rest of our threads
+	while (nextThread < numPartitions) {
+		while (true) {
+			for (int i = 0; i < maxThreads; i++) {
+				pthread_t* currThread = &threads[i];
+
+				// Check if the current thread has been completed
+				// and if it has, spawn another one
+				if (pthread_tryjoin_np(*currThread, NULL) == 0) {
+					// grab the current piece
+					range* piece = &pieces[nextThread];
+					// setup its attributes
+					pthread_attr_init(&threadAttributes[i]);
+					// and create the thread
+					pthread_create(&threads[i], &threadAttributes[i], runner, piece);
+					goto next; // get out of the inner loops and go again
+				}
+			}
+			// wait a bit in between check loops?
+		}
+		next: nextThread++;
+	}
+
+	for (int i = 0; i < maxThreads; i++) {
+		pthread_join(threads[i], NULL);
+	}
+
+	// no longer needed arrays
+	free(threadAttributes);
+	free(threads);
+
+	end = clock();
+	struct timeval endTime;
+	gettimeofday(&endTime, NULL);
+	// TODO: wall clock time is broken
+	printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", (double) endTime.tv_sec - startTime.tv_sec, (double) (end - start) / 1000000);
+
+	sorted = isSorted();
+	// Should be sorted
+	if (sorted) {
+		printf("Array is sorted!\n");
+	} else {
+		printf("Array is not sorted! :(\n");
+	}
+
 
 	free(array);
 	return 0;
@@ -255,4 +350,10 @@ void shellSort(int low, int hi) {
 		}
 		k = k >> 1;
 	} while (k > 0);
+}
+
+void* runner(void* parameters) {
+	range* params = (range*) parameters;
+	quickSort(params->L, params->R);
+	pthread_exit(0);
 }

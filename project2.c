@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
 						goto next; // get out of the inner loops and go again
 					}
 				}
-				// wait a bit in between check loops?
+				usleep(50000);
 			}
 			next: nextThread++;
 		}

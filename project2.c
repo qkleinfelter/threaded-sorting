@@ -30,9 +30,13 @@ typedef struct {
 } range;
 
 int main(int argc, char* argv[]) {
+	clock_t veryStart = clock();
+	struct timeval veryStartWall;
+	gettimeofday(&veryStartWall, NULL);
+
 	// command line syntax is "project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]"
 	if (argc < 3) {
-		printf("Not enough args.\n");
+		printf("Correct usage: project2 SIZE THRESHOLD [SEED [MULTITHREAD [PIECES [THREADS]]]]\n");
 		return 1;
 	}
 	arraySize = atoi(argv[1]);
@@ -274,6 +278,12 @@ int main(int argc, char* argv[]) {
 	// TODO: wall clock time is broken
 	printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", (double) endTime.tv_sec - startTime.tv_sec, (double) (end - start) / 1000000);
 
+	clock_t veryEnd = clock();
+	struct timeval veryEndWall;
+	gettimeofday(&veryEndWall, NULL);
+	// TODO: wall clock time is broken
+	printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", (double) veryEndWall.tv_sec - veryStartWall.tv_sec, (double) (veryEnd - veryStart) / 1000000);
+
 	sorted = isSorted();
 	// Should be sorted
 	if (sorted) {
@@ -281,7 +291,6 @@ int main(int argc, char* argv[]) {
 	} else {
 		printf("Array is not sorted! :(\n");
 	}
-
 
 	free(array);
 	return 0;

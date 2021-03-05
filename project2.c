@@ -239,31 +239,26 @@ int main(int argc, char* argv[]) {
 		// Now that we've spawned our first set of threads, we need to check repeatedly
 		// to continue spawning the rest of our threads
 		while (nextThread < numPartitions) {
-			while (true) {
-				for (int i = 0; i < maxThreads; i++) {
-					// grab the thread at our current index
-					pthread_t* currThread = &threads[i];
+			for (int i = 0; i < maxThreads; i++) {
+				// grab the thread at our current index
+				pthread_t* currThread = &threads[i];
 
-					// Check if the current thread has been completed
-					// and if it has, spawn another one
-					if (pthread_tryjoin_np(*currThread, NULL) == 0) {
-						// grab the next one we need to spawn
-						range* piece = &pieces[nextThread];
-						// setup its attributes
-						pthread_attr_init(&threadAttributes[i]);
-						// and create the thread
-						pthread_create(&threads[i], &threadAttributes[i], runner, piece);
-						goto next; // get out of the inner loops and go again
-					}
+				// Check if the current thread has been completed
+				// and if it has, spawn another one
+				if (pthread_tryjoin_np(*currThread, NULL) == 0) {
+					// grab the next one we need to spawn
+					range* piece = &pieces[nextThread];
+					// setup its attributes
+					pthread_attr_init(&threadAttributes[i]);
+					// and create the thread
+					pthread_create(&threads[i], &threadAttributes[i], runner, piece);
+					// increment the thread we're working on
+					nextThread++;
 				}
-				// Don't poll the threads again immediately, because its unlikely they've finished
-				// instead wait 50ms
-				usleep(50000);
 			}
-			// increment the thread tracker and go back into the infinite loop
-			// OR we'll hit the nextThread >= numPartitions condition, and break out
-			// because we'll have spawned all the threads needed to finish the sort
-			next: nextThread++;
+			// Don't poll the threads again immediately, because its unlikely they've finished
+			// instead wait 50ms
+			usleep(50000);
 		}
 
 		// Now we can loop through our remaining running threads

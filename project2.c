@@ -113,68 +113,67 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	start = clock();
-	int currPieces = 1;
-	// Array of ranges which are the partitions we have
-	range* pieces = (range*) malloc(numPartitions * sizeof(range));
-
-	// Our first "piece" is the whole array
-	pieces[0].L = 0;
-	pieces[0].R = arraySize - 1;
-
-	while (currPieces < numPartitions) {
-		range* largest = &pieces[0];
-		int largestSize = largest->R - largest->L + 1;
-
-		for (int i = 1; i < currPieces; i++) {
-			range* current = &pieces[i];
-			int currSize = current->R - current->L + 1;
-			if (currSize > largestSize) {
-				largest = current;
-				largestSize = currSize;
-			}
-		}
-
-		//printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
-
-		int midpt = partition(largest->L, largest->R);
-
-		range* newPart = &pieces[currPieces];
-		newPart->L = midpt + 1;
-		newPart->R = largest->R;
-
-		largest->R = midpt - 1;
-		int ls = largest->R - largest->L + 1;
-		int ns = newPart->R - newPart->L + 1;
-		int ts = ls + ns;
-		//printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
-
-		currPieces++;
-	}
-	end = clock();
-
-	// Now we have the list of partitions, so we should sort these in descending
-	// order by size, so we can shoot them off into threads largest -> smallest
-	// this uses insertion sort for now, maybe switch to something better later?
-	for (int i = 1; i < numPartitions; i++) {
-		range current = pieces[i];
-		int j = i - 1;
-
-		while(current.R - current.L + 1 > pieces[j].R - pieces[j].L + 1 && j >= 0) {
-			pieces[j + 1] = pieces[j];
-			--j;
-		}
-		pieces[j + 1] = current;
-	}
-
-	printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	start = clock();
 	struct timeval startTime;
-	gettimeofday(&startTime, NULL);
-
-	// TODO: Potentially not working
 	if (shouldMultithread) {
+		start = clock();
+		int currPieces = 1;
+		// Array of ranges which are the partitions we have
+		range* pieces = (range*) malloc(numPartitions * sizeof(range));
+
+		// Our first "piece" is the whole array
+		pieces[0].L = 0;
+		pieces[0].R = arraySize - 1;
+
+		while (currPieces < numPartitions) {
+			range* largest = &pieces[0];
+			int largestSize = largest->R - largest->L + 1;
+
+			for (int i = 1; i < currPieces; i++) {
+				range* current = &pieces[i];
+				int currSize = current->R - current->L + 1;
+				if (currSize > largestSize) {
+					largest = current;
+					largestSize = currSize;
+				}
+			}
+
+			//printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
+
+			int midpt = partition(largest->L, largest->R);
+
+			range* newPart = &pieces[currPieces];
+			newPart->L = midpt + 1;
+			newPart->R = largest->R;
+
+			largest->R = midpt - 1;
+			int ls = largest->R - largest->L + 1;
+			int ns = newPart->R - newPart->L + 1;
+			int ts = ls + ns;
+			//printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
+
+			currPieces++;
+		}
+		end = clock();
+
+		// Now we have the list of partitions, so we should sort these in descending
+		// order by size, so we can shoot them off into threads largest -> smallest
+		// this uses insertion sort for now, maybe switch to something better later?
+		for (int i = 1; i < numPartitions; i++) {
+			range current = pieces[i];
+			int j = i - 1;
+
+			while(current.R - current.L + 1 > pieces[j].R - pieces[j].L + 1 && j >= 0) {
+				pieces[j + 1] = pieces[j];
+				--j;
+			}
+			pieces[j + 1] = current;
+		}
+
+		printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
+
+		start = clock();
+		gettimeofday(&startTime, NULL);
+
 		// Now start spawning threads to sort
 		// Array of threads & thread attributes
 		pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
@@ -224,10 +223,10 @@ int main(int argc, char* argv[]) {
 		free(threadAttributes);
 		free(threads);
 	} else {
-		// No multithreading, so we can just loop over pieces and sort them
-		for (int i = 0; i < numPartitions; i++) {
-			quickSort(pieces[i].L, pieces[i].R);
-		}
+		// No multithreading, so we can just sort
+		start = clock();
+		gettimeofday(&startTime, NULL);
+		quickSort(0, arraySize - 1);
 	}
 
 	end = clock();

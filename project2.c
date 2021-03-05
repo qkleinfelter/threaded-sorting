@@ -299,9 +299,8 @@ int main(int argc, char* argv[]) {
 	//printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenOverall, (double) (veryEnd - veryStart) / 1000000);
 
 	// Make sure the array is actually sorted before we finish the program!!!
-	bool sorted = isSorted();
 	// Should be sorted
-	if (sorted) {
+	if (isSorted()) {
 		printf("Array is sorted!\n");
 	} else {
 		printf("Array is not sorted! :(\n");

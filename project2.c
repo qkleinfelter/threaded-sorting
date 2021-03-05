@@ -112,51 +112,6 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	// printf("Testing quicksort\n");
-	// start = clock();
-	// quickSort(0, arraySize - 1);
-	// end = clock();
-	// printf("Ran quicksort in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	// sorted = isSorted();
-	// // Should be sorted
-	// if (sorted) {
-	// 	printf("Array is sorted!\n");
-	// } else {
-	// 	printf("Array is not sorted! :(\n");
-	// }
-
-	// start = clock();
-	// // Randomize again to test shellsort
-	// for (int i = 0; i < arraySize; i++) {
-	// 	int secondIndex = rand() % arraySize;
-	// 	swap(&array[i], &array[secondIndex]);
-	// }
-	// end = clock();
-	// printf("Re-randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	// sorted = isSorted();
-	// // Shouldn't be sorted
-	// if (sorted) {
-	// 	printf("Array is sorted!\n");
-	// } else {
-	// 	printf("Array is not sorted! :(\n");
-	// }
-
-	// printf("Testing shellsort\n");
-	// start = clock();
-	// shellSort(0, arraySize - 1);
-	// end = clock();
-	// printf("Ran shellsort in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	// sorted = isSorted();
-	// // Should be sorted
-	// if (sorted) {
-	// 	printf("Array is sorted!\n");
-	// } else {
-	// 	printf("Array is not sorted! :(\n");
-	// }
-
 	start = clock();
 	int currPieces = 1;
 	// Array of ranges which are the partitions we have
@@ -210,12 +165,6 @@ int main(int argc, char* argv[]) {
 		}
 		pieces[j + 1] = current;
 	}
-
-	// Verify insertion sort worked
-	// for (int i = 0; i < numPartitions; i++) {
-	// 	printf("%d, ", pieces[i].R - pieces[i].L + 1);
-	// }
-	// printf("\n");
 
 	printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
 

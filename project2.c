@@ -284,14 +284,18 @@ int main(int argc, char* argv[]) {
 	struct timeval endTime;
 	gettimeofday(&endTime, NULL);
 	// TODO: wall clock time is broken
-	printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", (double) endTime.tv_sec - startTime.tv_sec, (double) (end - start) / 1000000);
+	double timeTakenSort = (endTime.tv_sec - startTime.tv_sec) * 1e6;
+	timeTakenSort = (timeTakenSort + (endTime.tv_usec - startTime.tv_usec)) * 1e-6;
+	printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenSort, (double) (end - start) / 1000000);
 
 	// as well as finish up the timing for the overall program
 	clock_t veryEnd = clock();
 	struct timeval veryEndWall;
 	gettimeofday(&veryEndWall, NULL);
 	// TODO: wall clock time is broken
-	printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", (double) veryEndWall.tv_sec - veryStartWall.tv_sec, (double) (veryEnd - veryStart) / 1000000);
+	double timeTakenOverall = (veryEndWall.tv_sec - veryStartWall.tv_sec) * 1e6;
+	timeTakenOverall = (timeTakenOverall + (veryEndWall.tv_usec - veryStartWall.tv_usec)) * 1e-6;
+	printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenOverall, (double) (veryEnd - veryStart) / 1000000);
 
 	// Make sure the array is actually sorted before we finish the program!!!
 	bool sorted = isSorted();

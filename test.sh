@@ -12,13 +12,13 @@ echo
 echo "big boi no multithread"
 ./project2 75000000 500 123 n
 
-echo 
-echo "big boi diff seed"
-./project2 75000000 500 123456
+# echo 
+# echo "big boi diff seed"
+# ./project2 75000000 500 123456
 
-echo
-echo "big boi no multithread diff seed"
-./project2 75000000 500 123456 n
+# echo
+# echo "big boi no multithread diff seed"
+# ./project2 75000000 500 123456 n
 
 # echo "larry 4 in a row large boys, diff max threads"
 # ./project2 150000000 100 123 y 10 1

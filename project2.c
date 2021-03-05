@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
+		//printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
 
 		int midpt = partition(largest->L, largest->R);
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 		int ls = largest->R - largest->L + 1;
 		int ns = newPart->R - newPart->L + 1;
 		int ts = ls + ns;
-		printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
+		//printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
 
 		currPieces++;
 	}
@@ -271,7 +271,13 @@ void swap(int* a, int* b) {
 
 void quickSort(int p, int r) {
 	if (p < r) { // base case: when down to 1 item, p == r
-		if (threshold != 0 && r - p + 1 <= threshold) {
+		int size = r - p + 1;
+		if (size < 2) return;
+		if (size == 2) {
+			if (array[p] > array[r]) {
+				swap(&array[p], &array[r]);
+			}
+		} else if (threshold != 0 && r - p + 1 <= threshold) {
 			// Shellsort instead of quicksort
 			shellSort(p, r);			
 		} else {

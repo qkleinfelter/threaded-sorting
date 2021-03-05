@@ -11,3 +11,11 @@ echo "big boi"
 echo
 echo "big boi no multithread"
 ./project2 75000000 500 123 n
+
+echo 
+echo "big boi diff seed"
+./project2 75000000 500 123456
+
+echo
+echo "big boi no multithread diff seed"
+./project2 75000000 500 123456 n

@@ -168,58 +168,66 @@ int main(int argc, char* argv[]) {
 
 	printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
 
-	// Now start spawning threads to sort
 	start = clock();
 	struct timeval startTime;
 	gettimeofday(&startTime, NULL);
 
-	// Array of threads & thread attributes
-	pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
-	pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
-	int nextThread = 0;
+	// TODO: Potentially not working
+	if (shouldMultithread) {
+		// Now start spawning threads to sort
+		// Array of threads & thread attributes
+		pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
+		pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
+		int nextThread = 0;
 
-	for (int i = 0; i < maxThreads; i++) {
-		// Spawn off our initial maxThreads threads
-		// grab the current piece
-		range* piece = &pieces[nextThread];
-		// setup its attributes
-		pthread_attr_init(&threadAttributes[i]);
-		// and create the thread
-		pthread_create(&threads[i], &threadAttributes[i], runner, piece);
-		nextThread++; // then increment which thread we're working on
-	}
-
-	// Now that we've spawned our first set of threads, we need to check repeatedly
-	// to continue spawning the rest of our threads
-	while (nextThread < numPartitions) {
-		while (true) {
-			for (int i = 0; i < maxThreads; i++) {
-				pthread_t* currThread = &threads[i];
-
-				// Check if the current thread has been completed
-				// and if it has, spawn another one
-				if (pthread_tryjoin_np(*currThread, NULL) == 0) {
-					// grab the current piece
-					range* piece = &pieces[nextThread];
-					// setup its attributes
-					pthread_attr_init(&threadAttributes[i]);
-					// and create the thread
-					pthread_create(&threads[i], &threadAttributes[i], runner, piece);
-					goto next; // get out of the inner loops and go again
-				}
-			}
-			// wait a bit in between check loops?
+		for (int i = 0; i < maxThreads; i++) {
+			// Spawn off our initial maxThreads threads
+			// grab the current piece
+			range* piece = &pieces[nextThread];
+			// setup its attributes
+			pthread_attr_init(&threadAttributes[i]);
+			// and create the thread
+			pthread_create(&threads[i], &threadAttributes[i], runner, piece);
+			nextThread++; // then increment which thread we're working on
 		}
-		next: nextThread++;
-	}
 
-	for (int i = 0; i < maxThreads; i++) {
-		pthread_join(threads[i], NULL);
-	}
+		// Now that we've spawned our first set of threads, we need to check repeatedly
+		// to continue spawning the rest of our threads
+		while (nextThread < numPartitions) {
+			while (true) {
+				for (int i = 0; i < maxThreads; i++) {
+					pthread_t* currThread = &threads[i];
 
-	// no longer needed arrays
-	free(threadAttributes);
-	free(threads);
+					// Check if the current thread has been completed
+					// and if it has, spawn another one
+					if (pthread_tryjoin_np(*currThread, NULL) == 0) {
+						// grab the current piece
+						range* piece = &pieces[nextThread];
+						// setup its attributes
+						pthread_attr_init(&threadAttributes[i]);
+						// and create the thread
+						pthread_create(&threads[i], &threadAttributes[i], runner, piece);
+						goto next; // get out of the inner loops and go again
+					}
+				}
+				// wait a bit in between check loops?
+			}
+			next: nextThread++;
+		}
+
+		for (int i = 0; i < maxThreads; i++) {
+			pthread_join(threads[i], NULL);
+		}
+
+		// no longer needed arrays
+		free(threadAttributes);
+		free(threads);
+	} else {
+		// No multithreading, so we can just loop over pieces and sort them
+		for (int i = 0; i < numPartitions; i++) {
+			quickSort(pieces[i].L, pieces[i].R);
+		}
+	}
 
 	end = clock();
 	struct timeval endTime;
@@ -312,6 +320,7 @@ void shellSort(int low, int hi) {
 
 void* runner(void* parameters) {
 	range* params = (range*) parameters;
+	printf("(%d, %d, %d)\n", params->L, params->R, params->R - params->L + 1);
 	quickSort(params->L, params->R);
 	pthread_exit(0);
 }

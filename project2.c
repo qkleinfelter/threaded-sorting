@@ -29,6 +29,15 @@
 int* array;
 int arraySize;
 int threshold; // when we switch from quicksort to shellsort
+int seed;
+double createTime;
+double initTime;
+double shuffleTime;
+double partitionTime;
+double sortingWallClock;
+double sortingCPU;
+double overallWallClock;
+double overallCPU;
 bool shouldMultithread = true; 
 int numPartitions = 10; // number of pieces to split the array into
 int maxThreads = 4; // max threads to run at once
@@ -62,8 +71,13 @@ int main(int argc, char* argv[]) {
 
 	if (argc >= 4) {
 		// At least 4 args, must have a seed
-		if (atoi(argv[3]) == -1) srand(clock());
-		else srand(atoi(argv[3]));
+		if (atoi(argv[3]) == -1) {
+			seed = clock();
+			srand(seed);
+		}else {
+			seed = atoi(argv[3]);
+			srand(atoi(argv[3]));
+		}
 	}
 
 	if (argc >= 5) {
@@ -99,7 +113,7 @@ int main(int argc, char* argv[]) {
 	clock_t start = clock();
 	array = (int*) malloc(sizeof(int)*arraySize);
 	clock_t end = clock();
-	printf("Created array in %3.3f seconds\n", (double) (end - start) / 1000000);
+	createTime = (double) (end - start) / 1000000;
 
 	// Initializing the array & timing it
 	start = clock();
@@ -108,7 +122,7 @@ int main(int argc, char* argv[]) {
 		array[i] = i;
 	}
 	end = clock();
-	printf("Initialized array in %3.3f seconds\n", (double) (end - start) / 1000000);
+	initTime = (double) (end - start) / 1000000;
 
 	// Randomizing the array & timing it
 	start = clock();
@@ -117,15 +131,7 @@ int main(int argc, char* argv[]) {
 		swap(&array[i], &array[secondIndex]);
 	}
 	end = clock();
-	printf("Randomized array in %3.3f seconds\n", (double) (end - start) / 1000000);
-
-	// bool sorted = isSorted();
-	// // Shouldn't be sorted
-	// if (sorted) {
-	// 	printf("Array is sorted!\n");
-	// } else {
-	// 	printf("Array is not sorted! :(\n");
-	// }
+	shuffleTime = (double) (end - start) / 1000000;
 
 	// timing structure, used either in multithreaded mode or not, so keep it out of the if
 	struct timeval startTime;
@@ -165,9 +171,6 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			// debug sizing information
-			//printf("Partitioning %d - %d (%d)...result: ", largest->L, largest->R, largestSize);
-
 			// Now that we've determined our largest piece, we can partition it into 
 			// 2 smaller pieces, with the pivot value being stored in midpt
 			int midpt = partition(largest->L, largest->R);
@@ -185,18 +188,12 @@ int main(int argc, char* argv[]) {
 			// so that it becomes the left half of the partition
 			largest->R = midpt - 1;
 
-			// debug sizing information
-			// int ls = largest->R - largest->L + 1;
-			// int ns = newPart->R - newPart->L + 1;
-			// int ts = ls + ns;
-			//printf("%d - %d (%2.2f / %2.2f)\n", ls, ns, (double) ls / ts, (double) ns / ts);
-
 			// finally, we can increment currPieces and continue looping
 			currPieces++;
 		}
 		// Once we're done partitioning we can finish the timing and print it
 		end = clock();
-		printf("Partitioned array in %3.3f seconds\n", (double) (end - start) / 1000000);
+		partitionTime = (double) (end - start) / 1000000;
 
 		// Now we have the list of partitions, so we should sort these in descending
 		// order by size, so we can shoot them off into threads largest -> smallest
@@ -286,7 +283,9 @@ int main(int argc, char* argv[]) {
 	// TODO: wall clock time is broken
 	double timeTakenSort = (endTime.tv_sec - startTime.tv_sec) * 1e6;
 	timeTakenSort = (timeTakenSort + (endTime.tv_usec - startTime.tv_usec)) * 1e-6;
-	printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenSort, (double) (end - start) / 1000000);
+	sortingCPU = (double) (end - start) / 1000000;
+	sortingWallClock = timeTakenSort;
+	//printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenSort, (double) (end - start) / 1000000);
 
 	// as well as finish up the timing for the overall program
 	clock_t veryEnd = clock();
@@ -295,7 +294,9 @@ int main(int argc, char* argv[]) {
 	// TODO: wall clock time is broken
 	double timeTakenOverall = (veryEndWall.tv_sec - veryStartWall.tv_sec) * 1e6;
 	timeTakenOverall = (timeTakenOverall + (veryEndWall.tv_usec - veryStartWall.tv_usec)) * 1e-6;
-	printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenOverall, (double) (veryEnd - veryStart) / 1000000);
+	overallCPU = (double) (veryEnd - veryStart) / 1000000;
+	overallWallClock = timeTakenOverall;
+	//printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenOverall, (double) (veryEnd - veryStart) / 1000000);
 
 	// Make sure the array is actually sorted before we finish the program!!!
 	bool sorted = isSorted();
@@ -306,7 +307,26 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	// free up the array and return success
+	// Print out our final summary statistics
+	printf("%d ", arraySize);
+	printf("%d ", threshold);
+	if (seed) {
+		printf("%d ", seed);
+	} else {
+		printf("00 ");
+	}
+	printf("%d ", numPartitions);
+	printf("%d ", maxThreads);
+	printf("%3.3f ", createTime);
+	printf("%3.3f ", initTime);
+	printf("%3.3f ", shuffleTime);
+	printf("%3.3f ", partitionTime);
+	printf("%3.3f ", sortingWallClock);
+	printf("%3.3f ", sortingCPU);
+	printf("%3.3f ", overallWallClock);
+	printf("%3.3f\n", overallCPU);
+
+	// free up the array
 	free(array);
 	return 0;
 }

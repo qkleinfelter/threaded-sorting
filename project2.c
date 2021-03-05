@@ -45,7 +45,7 @@ int maxThreads = 4; // max threads to run at once
 // Methods
 bool isSorted();
 void swap(int* a, int* b);
-void quickSort(int p, int r);
+void hybridSort(int p, int r);
 int partition(int p, int r);
 void shellSort(int low, int hi);
 void* runner(void* parameters);
@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
 		// No multithreading, so we can just sort & time it
 		start = clock();
 		gettimeofday(&startTime, NULL);
-		quickSort(0, arraySize - 1);
+		hybridSort(0, arraySize - 1);
 	}
 
 	// At this point the array is sorted, so we can finish up the timing and print the results
@@ -351,7 +351,7 @@ void swap(int* a, int* b) {
 	*b = temp;
 }
 
-void quickSort(int p, int r) {
+void hybridSort(int p, int r) {
 	if (p < r) { // base case: when down to 1 item, p == r
 		int size = r - p + 1;
 		if (size < 2) return; // nothing to sort
@@ -367,8 +367,8 @@ void quickSort(int p, int r) {
 		} else {
 			// otherwise continue quicksorting
 			int q = partition(p, r); // split the list, pivot is q
-			quickSort(p, q - 1); // recursively quicksort the left side
-			quickSort(q + 1, r); // recursively quicksort the right side
+			hybridSort(p, q - 1); // recursively quicksort the left side
+			hybridSort(q + 1, r); // recursively quicksort the right side
 		}
 	}
 }
@@ -426,7 +426,7 @@ void* runner(void* parameters) {
 	// Print the left side, right side, and size as we start the thread
 	printf("(%d, %d, %d)\n", params->L, params->R, params->R - params->L + 1);
 	// quicksort on the thread from the left to the right
-	quickSort(params->L, params->R);
+	hybridSort(params->L, params->R);
 	// and exit the thread once we're here
 	pthread_exit(0);
 }

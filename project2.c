@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 // Global variables
 int* array;

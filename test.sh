@@ -1,5 +1,5 @@
-# # compile
-# gcc -g -pthread project2.c -o project2
+# compile
+gcc -g -pthread project2.c -o project2
 
 # echo "reasonable one"
 # ./project2 10000000 500 -1
@@ -21,10 +21,10 @@
 # ./project2 75000000 500 123456 n
 
 echo "larry 4 in a row large boys, diff max threads"
-./project2 150000000 100 -1 y 10 1
+./project2 150000000 100 123 y 10 1
 echo
-./project2 150000000 100 -1 y 10 2
+./project2 150000000 100 123 y 10 2
 echo
-./project2 150000000 100 -1 y 10 3
+./project2 150000000 100 123 y 10 3
 echo
-./project2 150000000 100 -1 y 10 4
+./project2 150000000 100 123 y 10 4

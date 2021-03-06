@@ -218,25 +218,25 @@ int main(int argc, char* argv[]) {
 		// Array of threads & thread attributes
 		pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
 		pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
-		// variable to keep track of the next thread to shoot off
-		int nextThread = 0;
+		// variable to keep track of the next partition to shoot off
+		int nextPartition = 0;
 
 		for (int i = 0; i < maxThreads; i++) {
 			// Spawn off our initial maxThreads threads
 
 			// grab the current piece
-			range* piece = &pieces[nextThread];
+			range* piece = &pieces[nextPartition];
 			// setup its attributes
 			pthread_attr_init(&threadAttributes[i]);
 			// and create the thread
 			pthread_create(&threads[i], &threadAttributes[i], runner, piece);
-			nextThread++; // then increment which thread we're working on
+			nextPartition++; // then increment which partition we're working on
 		}
 
 		// Now that we've spawned our first set of threads, we need to check repeatedly
 		// to continue spawning the rest of our threads
-		while (nextThread < numPartitions) {
-			for (int i = 0; i < maxThreads; i++) {
+		while (nextPartition < numPartitions) {
+			for (int i = 0; i < maxThreads && nextPartition < numPartitions; i++) {
 				// grab the thread at our current index
 				pthread_t* currThread = &threads[i];
 
@@ -244,13 +244,13 @@ int main(int argc, char* argv[]) {
 				// and if it has, spawn another one
 				if (pthread_tryjoin_np(*currThread, NULL) == 0) {
 					// grab the next one we need to spawn
-					range* piece = &pieces[nextThread];
+					range* piece = &pieces[nextPartition];
 					// setup its attributes
 					pthread_attr_init(&threadAttributes[i]);
 					// and create the thread
 					pthread_create(&threads[i], &threadAttributes[i], runner, piece);
-					// increment the thread we're working on
-					nextThread++;
+					// increment the partition we're working on
+					nextPartition++;
 				}
 			}
 			// Don't poll the threads again immediately, because its unlikely they've finished

@@ -144,7 +144,8 @@ int main(int argc, char* argv[]) {
 		// we start currPieces at 1 because we're going to make the first piece before the loop
 		int currPieces = 1;
 		// Array of ranges which are the partitions we have currently
-		range* pieces = (range*) malloc(numPartitions * sizeof(range));
+		//range* pieces = (range*) malloc(numPartitions * sizeof(range));
+		range pieces[numPartitions];
 
 		// Our first "piece" is the whole array
 		pieces[0].L = 0;
@@ -216,8 +217,10 @@ int main(int argc, char* argv[]) {
 
 		// Now start spawning threads to sort
 		// Array of threads & thread attributes
-		pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
-		pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
+		//pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
+		pthread_t threads[maxThreads];
+		//pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
+		pthread_attr_t threadAttributes[maxThreads];
 		// variable to keep track of the next partition to shoot off
 		int nextPartition = 0;
 
@@ -267,8 +270,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		// no longer needed arrays
-		free(threadAttributes);
-		free(threads);
+		//free(threadAttributes);
+		//free(threads);
 	} else {
 		// No multithreading, so we can just sort & time it
 		start = clock();
@@ -280,7 +283,6 @@ int main(int argc, char* argv[]) {
 	end = clock();
 	struct timeval endTime;
 	gettimeofday(&endTime, NULL);
-	// TODO: wall clock time is broken
 	double timeTakenSort = (endTime.tv_sec - startTime.tv_sec) * 1e6;
 	timeTakenSort = (timeTakenSort + (endTime.tv_usec - startTime.tv_usec)) * 1e-6;
 	sortingCPU = (double) (end - start) / 1000000;
@@ -291,7 +293,6 @@ int main(int argc, char* argv[]) {
 	clock_t veryEnd = clock();
 	struct timeval veryEndWall;
 	gettimeofday(&veryEndWall, NULL);
-	// TODO: wall clock time is broken
 	double timeTakenOverall = (veryEndWall.tv_sec - veryStartWall.tv_sec) * 1e6;
 	timeTakenOverall = (timeTakenOverall + (veryEndWall.tv_usec - veryStartWall.tv_usec)) * 1e-6;
 	overallCPU = (double) (veryEnd - veryStart) / 1000000;

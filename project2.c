@@ -307,24 +307,26 @@ int main(int argc, char* argv[]) {
 		printf("Array is not sorted! :(\n");
 	}
 
-	// Print out our final summary statistics
-	printf("%d ", arraySize);
-	printf("%d ", threshold);
+	// Print out our final summary statistics & labels
+	printf("     SIZE    THRESHOLD  SEED  PC T CREATE   INIT  SHUFFLE   PART  SrtWall Srt CPU ALLWall ALL CPU\n");
+	printf("   --------- --------- ------ -- - ------ ------- ------- ------- ------- ------- ------- -------\n");
+	printf("F: %9d ", arraySize);
+	printf("%9d ", threshold);
 	if (seed) {
-		printf("%d ", seed);
+		printf("%6d ", seed);
 	} else {
 		printf("00 ");
 	}
-	printf("%d ", numPartitions);
-	printf("%d ", maxThreads);
-	printf("%3.3f ", createTime);
-	printf("%3.3f ", initTime);
-	printf("%3.3f ", shuffleTime);
-	printf("%3.3f ", partitionTime);
-	printf("%3.3f ", sortingWallClock);
-	printf("%3.3f ", sortingCPU);
-	printf("%3.3f ", overallWallClock);
-	printf("%3.3f\n", overallCPU);
+	printf("%2d ", numPartitions);
+	printf("%1d ", maxThreads);
+	printf("%6.3f ", createTime);
+	printf("%7.3f ", initTime);
+	printf("%7.3f ", shuffleTime);
+	printf("%7.3f ", partitionTime);
+	printf("%7.3f ", sortingWallClock);
+	printf("%7.3f ", sortingCPU);
+	printf("%7.3f ", overallWallClock);
+	printf("%7.3f\n", overallCPU);
 
 	// free up the array
 	free(array);

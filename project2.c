@@ -30,11 +30,6 @@
 int* array;
 int arraySize;
 int threshold; // when we switch from quicksort to shellsort
-int seed = NO_SEED;
-double createTime, initTime, shuffleTime, partitionTime, sortingWallClock, sortingCPU, overallWallClock, overallCPU;
-bool shouldMultithread = true; 
-int numPartitions = 10; // number of pieces to split the array into
-int maxThreads = 4; // max threads to run at once
 
 // Methods
 bool isSorted();
@@ -51,6 +46,14 @@ typedef struct {
 } range;
 
 int main(int argc, char* argv[]) {
+	// variables for various things
+	// (its a surprise tool that will help us later)
+	int seed = NO_SEED;
+	double createTime, initTime, shuffleTime, partitionTime, sortingWallClock, sortingCPU, overallWallClock, overallCPU;
+	bool shouldMultithread = true; 
+	int numPartitions = 10; // number of pieces to split the array into
+	int maxThreads = 4; // max threads to run at once
+
 	// Clock values for the beginning of everything
 	clock_t veryStart = clock();
 	struct timeval veryStartWall;

@@ -31,3 +31,11 @@ echo "2 pieces / 4 threads should error"
 echo
 echo "2 pieces / 2 threads should work"
 ./project2 5000000 500 -1 y 2 2
+
+echo
+echo "only quicksort"
+./project2 5000000 1 -1 y
+
+echo
+echo "only shellsort"
+./project2 5000000 5000000

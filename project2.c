@@ -352,7 +352,7 @@ void hybridSort(int p, int r) {
 			if (array[p] > array[r]) {
 				swap(&array[p], &array[r]);
 			}
-		} else if (threshold != 0 && r - p + 1 <= threshold) {
+		} else if (size <= threshold) {
 			// Shellsort instead of quicksort
 			// if our remaining number of elements is less than the threshold
 			shellSort(p, r);			

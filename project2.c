@@ -297,7 +297,7 @@ int main(int argc, char* argv[]) {
 	if (seed) {
 		printf("%6d ", seed);
 	} else {
-		printf("00 ");
+		printf("    00 ");
 	}
 	printf("%2d ", numPartitions);
 	printf("%1d ", maxThreads);

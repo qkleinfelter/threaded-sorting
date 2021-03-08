@@ -12,6 +12,10 @@ echo
 echo "big boi no multithread"
 ./project2 75000000 500 123 n
 
+echo 
+echo "no seed test"
+./project2 5000000 500
+
 # echo 
 # echo "big boi diff seed"
 # ./project2 75000000 500 123456

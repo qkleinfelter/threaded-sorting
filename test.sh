@@ -39,3 +39,7 @@ echo "only quicksort"
 echo
 echo "only shellsort"
 ./project2 5000000 5000000
+
+echo
+echo "valgrind run"
+valgrind ./project2 500000 500

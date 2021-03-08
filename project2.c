@@ -24,12 +24,13 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#define NO_SEED -2
 
 // Global variables
 int* array;
 int arraySize;
 int threshold; // when we switch from quicksort to shellsort
-int seed;
+int seed = NO_SEED;
 double createTime, initTime, shuffleTime, partitionTime, sortingWallClock, sortingCPU, overallWallClock, overallCPU;
 bool shouldMultithread = true; 
 int numPartitions = 10; // number of pieces to split the array into
@@ -67,7 +68,7 @@ int main(int argc, char* argv[]) {
 		if (atoi(argv[3]) == -1) {
 			seed = clock();
 			srand(seed);
-		}else {
+		} else {
 			seed = atoi(argv[3]);
 			srand(atoi(argv[3]));
 		}
@@ -294,7 +295,7 @@ int main(int argc, char* argv[]) {
 	printf("   --------- --------- ------ -- - ------ ------- ------- ------- ------- ------- ------- -------\n");
 	printf("F: %9d ", arraySize);
 	printf("%9d ", threshold);
-	if (seed) {
+	if (seed != NO_SEED) {
 		printf("%6d ", seed);
 	} else {
 		printf("    00 ");

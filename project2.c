@@ -103,6 +103,11 @@ int main(int argc, char* argv[]) {
 		} // again, requires multithreading
 	}
 
+	if (maxThreads > numPartitions) {
+		printf("Can't have more threads than partitions\n");
+		return 1;
+	}
+
 	// Creating the array & timing it
 	clock_t start = clock();
 	array = (int*) malloc(sizeof(int)*arraySize);

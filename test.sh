@@ -16,19 +16,18 @@ echo
 echo "no seed test"
 ./project2 5000000 500
 
-# echo 
-# echo "big boi diff seed"
-# ./project2 75000000 500 123456
+echo
+echo "y multithread"
+./project2 5000000 500 -1 y
 
-# echo
-# echo "big boi no multithread diff seed"
-# ./project2 75000000 500 123456 n
+echo
+echo "2 pieces - default 4 threads, should error"
+./project2 5000000 500 -1 y 2
 
-# echo "larry 4 in a row large boys, diff max threads"
-# ./project2 150000000 100 123 y 10 1
-# echo
-# ./project2 150000000 100 123 y 10 2
-# echo
-# ./project2 150000000 100 123 y 10 3
-# echo
-# ./project2 150000000 100 123 y 10 4
+echo
+echo "2 pieces / 4 threads should error"
+./project2 5000000 500 -1 y 2 4
+
+echo
+echo "2 pieces / 2 threads should work"
+./project2 5000000 500 -1 y 2 2

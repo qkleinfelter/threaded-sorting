@@ -103,6 +103,8 @@ int main(int argc, char* argv[]) {
 		} // again, requires multithreading
 	}
 
+	// Handles the case where a user inputs a number of partitions that is less than
+	// maxThreads's default value of 4, and doesn't enter a maxThreads value
 	if (maxThreads > numPartitions) {
 		printf("Can't have more threads than partitions\n");
 		return 1;

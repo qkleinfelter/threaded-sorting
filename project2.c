@@ -409,7 +409,7 @@ void* runner(void* parameters) {
 	// grab the range specified in the parameters
 	range* params = (range*) parameters;
 	// Print the left side, right side, and size as we start the thread
-	printf("(%d, %d, %d)\n", params->L, params->R, params->R - params->L + 1);
+	printf("(%9d, %9d, %9d)\n", params->L, params->R, params->R - params->L + 1);
 	// quicksort on the thread from the left to the right
 	hybridSort(params->L, params->R);
 	// and exit the thread once we're here

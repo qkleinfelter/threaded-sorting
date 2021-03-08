@@ -6,7 +6,7 @@ echo "reasonable one"
 
 echo 
 echo "big boi"
-./project2 75000000 500 123
+./project2 75000000 500 -1 y 15 4
 
 echo
 echo "big boi no multithread"

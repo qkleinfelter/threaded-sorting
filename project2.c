@@ -12,7 +12,7 @@
 	Author: Quinn Kleinfelter
 	Class: EECS 3540-001 Operating Systems & Systems Programming Spring 2021
 	Instructor: Dr. Thomas
-	Last Edited: 3/5/21
+	Last Edited: 3/8/21
 	Copyright: Copyright 2021 by Quinn Kleinfelter. All rights reserved.
 */
 #define _GNU_SOURCE
@@ -30,14 +30,7 @@ int* array;
 int arraySize;
 int threshold; // when we switch from quicksort to shellsort
 int seed;
-double createTime;
-double initTime;
-double shuffleTime;
-double partitionTime;
-double sortingWallClock;
-double sortingCPU;
-double overallWallClock;
-double overallCPU;
+double createTime, initTime, shuffleTime, partitionTime, sortingWallClock, sortingCPU, overallWallClock, overallCPU;
 bool shouldMultithread = true; 
 int numPartitions = 10; // number of pieces to split the array into
 int maxThreads = 4; // max threads to run at once
@@ -144,7 +137,6 @@ int main(int argc, char* argv[]) {
 		// we start currPieces at 1 because we're going to make the first piece before the loop
 		int currPieces = 1;
 		// Array of ranges which are the partitions we have currently
-		//range* pieces = (range*) malloc(numPartitions * sizeof(range));
 		range pieces[numPartitions];
 
 		// Our first "piece" is the whole array
@@ -198,12 +190,12 @@ int main(int argc, char* argv[]) {
 
 		// Now we have the list of partitions, so we should sort these in descending
 		// order by size, so we can shoot them off into threads largest -> smallest
-		// this uses insertion sort for now, maybe switch to something better later?
+		// this uses insertion sort for now
 		for (int i = 1; i < numPartitions; i++) {
 			range current = pieces[i];
 			int j = i - 1;
 
-			while(current.R - current.L + 1 > pieces[j].R - pieces[j].L + 1 && j >= 0) {
+			while(j >= 0 && current.R - current.L + 1 > pieces[j].R - pieces[j].L + 1) {
 				pieces[j + 1] = pieces[j];
 				--j;
 			}
@@ -217,9 +209,7 @@ int main(int argc, char* argv[]) {
 
 		// Now start spawning threads to sort
 		// Array of threads & thread attributes
-		//pthread_t* threads = (pthread_t*) malloc(maxThreads * sizeof(pthread_t));
 		pthread_t threads[maxThreads];
-		//pthread_attr_t* threadAttributes = (pthread_attr_t*) malloc(maxThreads * sizeof(pthread_attr_t));
 		pthread_attr_t threadAttributes[maxThreads];
 		// variable to keep track of the next partition to shoot off
 		int nextPartition = 0;
@@ -268,10 +258,6 @@ int main(int argc, char* argv[]) {
 			// so we can just loop through them all once
 			pthread_join(threads[i], NULL);
 		}
-
-		// no longer needed arrays
-		//free(threadAttributes);
-		//free(threads);
 	} else {
 		// No multithreading, so we can just sort & time it
 		start = clock();
@@ -287,7 +273,6 @@ int main(int argc, char* argv[]) {
 	timeTakenSort = (timeTakenSort + (endTime.tv_usec - startTime.tv_usec)) * 1e-6;
 	sortingCPU = (double) (end - start) / 1000000;
 	sortingWallClock = timeTakenSort;
-	//printf("Seconds spent sorting: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenSort, (double) (end - start) / 1000000);
 
 	// as well as finish up the timing for the overall program
 	clock_t veryEnd = clock();
@@ -297,14 +282,11 @@ int main(int argc, char* argv[]) {
 	timeTakenOverall = (timeTakenOverall + (veryEndWall.tv_usec - veryStartWall.tv_usec)) * 1e-6;
 	overallCPU = (double) (veryEnd - veryStart) / 1000000;
 	overallWallClock = timeTakenOverall;
-	//printf("Seconds spent overall: Wall Clock: %3.3f / CPU: %3.3f\n", timeTakenOverall, (double) (veryEnd - veryStart) / 1000000);
 
 	// Make sure the array is actually sorted before we finish the program!!!
 	// Should be sorted
-	if (isSorted()) {
-		printf("Array is sorted!\n");
-	} else {
-		printf("Array is not sorted! :(\n");
+	if (!isSorted()) {
+		printf("Array is not sorted!!!\n");
 	}
 
 	// Print out our final summary statistics & labels

@@ -34,7 +34,7 @@ echo "2 pieces / 2 threads should work"
 
 echo
 echo "only quicksort"
-./project2 5000000 1 -1 y
+./project2 5000000 1
 
 echo
 echo "only shellsort"

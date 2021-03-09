@@ -271,6 +271,9 @@ int main(int argc, char* argv[]) {
 		}
 	} else {
 		// No multithreading, so we can just sort & time it
+		// also we set numPartitions and maxThreads to 1, so that it prints correctly
+		numPartitions = 1;
+		maxThreads = 1;
 		start = clock();
 		gettimeofday(&startTime, NULL);
 		hybridSort(0, arraySize - 1);
